@@ -1,19 +1,17 @@
-/* this program returns the index of a string
- */
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 #include "hash.h"
 
-int main( int argc, char **argv )
-{
+int main( int argc, char **argv ) {
   char idxname[BUFFER];
   char txtname[BUFFER];
 
-  char *basename;
-  char *value;
+  char *basename1 = "building";
+  char *basename2 = "room";
+  char *buildingValue;
+  char *roomValue;
   long hash_table[ HASHSIZE ];
 
   if (argc!=3)
@@ -22,31 +20,51 @@ int main( int argc, char **argv )
     exit(-1);
   }
 
+  // target value
+  buildingValue = argv[1];
+  roomValue = argv[2];
+
   // identify text file name
-  strcpy( idxname, argv[1] );
+  strcpy( idxname, basename1 );
   strcat( idxname, ".idx" );
-  strcpy( txtname, argv[1] );
+  strcpy( txtname, basename1 );
   strcat( txtname, ".txt" );
 
-  // basefile for hashing
-  basename = argv[1];
-
-  // target value
-  value = argv[2];
 
   // load hashtable from file into memory
-  get_hashtable( basename, hash_table );
+  get_hashtable( basename1, hash_table );
 
   // open text file
   FILE *idxfile = fopen( idxname, "r" );
   FILE *txtfile = fopen( txtname, "r" );
 
   // print result of hash_lookup
-  printf( "%ld\n", hash_lookup( value, hash_table, idxfile, txtfile ) );
+  printf( "%ld\n", hash_lookup( buildingValue, hash_table, idxfile, txtfile ) );
+
   fclose( idxfile );
   fclose( txtfile );
 
-  printf("DONE!!");
+  // identify text file name
+  strcpy( idxname, basename2 );
+  strcat( idxname, ".idx" );
+  strcpy( txtname, basename2 );
+  strcat( txtname, ".txt" );
+
+
+  // load hashtable from file into memory
+  get_hashtable( basename2, hash_table );
+
+  // open text file
+  idxfile = fopen( idxname, "r" );
+  txtfile = fopen( txtname, "r" );
+
+  // print result of hash_lookup
+  printf( "%ld\n", hash_lookup( roomValue, hash_table, idxfile, txtfile ) );
+
+  fclose( idxfile );
+  fclose( txtfile );
+
+
 
 
 //   printf( “%s*%s %s %s - %s\n”, subject, courseno, days, from, to );
