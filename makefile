@@ -1,6 +1,6 @@
 CC=clang
 CFLAGS=-std=c99 -Wall -pedantic
-EXECS=index get_idx get_string query longdump and set2idx
+EXECS=a6 index get_idx get_string query longdump and set2idx
 
 all: $(EXECS)
 
@@ -15,6 +15,12 @@ clean:
 
 
 # compile a5test1.c using the ARRAY flag to use array operations
+# a6: hash.o set2idx.o and.o longdump.o query.o get_string.o get_idx.o index.o a6.o
+# 	$(CC) $(CFLAGS) hash.o set2idx.o and.o longdump.o query.o get_string.o get_idx.o index.o a6.o -o a6
+
+a6: a6.o hash.o hash.h
+	$(CC) $(CFLAGS) a6.o hash.o -o a6
+
 index:  index.o hash.h hash.o
 	$(CC) $(CFLAGS) index.o hash.o -o index
 

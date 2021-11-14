@@ -46,6 +46,8 @@ int main( int argc, char **argv )
   fclose( idxfile );
   fclose( txtfile );
 
+  printf("DONE!!");
+
 
 //   printf( “%s*%s %s %s - %s\n”, subject, courseno, days, from, to );
 
