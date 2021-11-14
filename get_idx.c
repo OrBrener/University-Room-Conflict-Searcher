@@ -47,8 +47,5 @@ int main( int argc, char **argv )
   fclose( txtfile );
 
 
-//   printf( “%s*%s %s %s - %s\n”, subject, courseno, days, from, to );
-
-
   return 0;
 } 
