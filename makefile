@@ -5,7 +5,7 @@ EXECS=a6 index get_idx get_string query longdump and set2idx
 all: $(EXECS)
 
 clean:
-	rm -i $($EXECS) *.o
+	rm -i $($EXECS) *.o a6
 
 # override the implicit compilation rules for executables so that we can
 # override them with new ones
