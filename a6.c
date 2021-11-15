@@ -120,6 +120,61 @@ void and(char* setFile1, char* setFile2, char* outputFile) {
   fclose( fp3 );
 }
 
+int set2Index_oneValue(char* filename) {
+  char boolean;
+
+  FILE *fp = fopen( filename, "rb" );
+
+  for (int i=0; fread(&boolean,1,1,fp)==1; i++)
+  {
+    if (boolean)
+      return i;
+  }
+
+  return -1;
+}
+
+char* getString(char* basenameInput, int index) {
+  char *basename;
+  int idx, idx2;
+
+  basename = basenameInput;
+  idx = index;
+
+  char txtfile[BUFFER];
+  char idxfile[BUFFER];
+  char* buffer = malloc (BUFFER);
+
+  FILE *fptxt, *fpidx;
+
+  strcpy( txtfile, basename );
+  strcat( txtfile, ".txt" );
+
+  strcpy( idxfile, basename );
+  strcat( idxfile, ".idx" );
+
+  fptxt = fopen( txtfile, "r" );
+  fpidx = fopen( idxfile, "r" );
+
+  fseek( fpidx, sizeof(long)*idx, SEEK_SET );
+  
+  if ( fread( &idx2, sizeof(long), 1, fpidx ) != 1 )
+  {
+    fprintf( stderr, "Error: invalid index\n" );
+    exit(-1);
+  }
+
+  fclose( fpidx );
+
+  fseek( fptxt, idx2, SEEK_SET );
+  fgets( buffer, BUFFER, fptxt );
+  fclose( fptxt );
+
+  buffer[strlen(buffer)-1 ] = '\0';
+
+  return buffer;
+}
+
 int main( int argc, char **argv ) {
   
   //value of indicies after hash_lookup()
@@ -134,6 +189,7 @@ int main( int argc, char **argv ) {
   char* roomFile = "file.set";
   char* intersectionFile = "intersection.set";
 
+
   //make sure user inputs the correct command line (+ arguments)
   if (argc!=3) {
     fprintf( stderr, "Usage: %s <buildingName> <roomNumber>\n", argv[0] );
@@ -143,14 +199,14 @@ int main( int argc, char **argv ) {
   // ---------- GET INDEX OF BUILDING ---------- //
 
   indexBuilding = getIndex("building", buildingValue);
-  printf( "Index of building %s: %ld\n",buildingValue, indexBuilding );
+  // printf( "Index of building %s: %ld\n",buildingValue, indexBuilding );
 
   // ---------- GET INDEX OF BUILDING ---------- //
 
   // ---------- GET INDEX OF ROOM ---------- //
 
   indexRoom = getIndex("room", roomValue);
-  printf( "Index of room %s: %ld\n", roomValue, indexRoom );
+  // printf( "Index of room %s: %ld\n", roomValue, indexRoom );
 
   // ---------- GET INDEX OF ROOM ---------- //
 
@@ -172,7 +228,48 @@ int main( int argc, char **argv ) {
 
   // ---------- SET FILE OF INDICES OF INTERSECTION OF BUILDING_FILE AND ROOM_FILE ---------- //
 
-//   printf( “%s*%s %s %s - %s\n”, subject, courseno, days, from, to );
+  char boolean;
+
+  FILE *fp = fopen( intersectionFile, "rb" );
+
+  for (int i=0; fread(&boolean,1,1,fp)==1; i++)
+  {
+    if (boolean) {
+      getQuery(i, "subject", -1, "subject.set");
+      int subjectIndex = set2Index_oneValue("subject.set");
+      char* subject = getString("subject", subjectIndex);
+      // printf("SUBJECT: %s\n", subject);
+
+      getQuery(i, "courseno", -1, "courseno.set");
+      int courseNumberIndex = set2Index_oneValue("courseno.set");
+      char* courseno = getString("courseno", courseNumberIndex);
+      // printf("COURSENO: %s\n", courseno);
+
+      getQuery(i, "days", -1, "days.set");
+      int daysIndex = set2Index_oneValue("days.set");
+      char* days = getString("days", daysIndex);
+      // printf("DAYS: %s\n", days);
+
+      getQuery(i, "from", -1, "from.set");
+      int fromIndex = set2Index_oneValue("from.set");
+      char* from = getString("from", fromIndex);
+      // printf("FROM: %s\n", from);
+
+      getQuery(i, "to", -1, "to.set");
+      int toIndex = set2Index_oneValue("to.set");
+      char* to = getString("to", toIndex);
+      // printf("TO: %s\n", to);
+
+      printf( "%s*%s %s %s - %s\n", subject, courseno, days, from, to );
+
+      free(subject);
+      free(courseno);
+      free(days);
+      free(from);
+      free(to);
+    }
+  }
+
 
 
   return 0;
