@@ -40,6 +40,67 @@ long getIndex(char* filename, char* value) {
 
 }
 
+//function taken from query.c
+int entries( char *filebase ) {
+  char filename[BUFFER];
+  int ent;
+
+  strcpy( filename, filebase );
+  strcat( filename, ".idx" );
+  FILE *fp = fopen( filename, "rb" );
+  fseek( fp, 0, SEEK_END );
+  ent = ftell( fp ) / sizeof(long);
+  fclose(fp);
+
+  return ent;
+}
+
+//steps 3 & 4
+//creates an output set file that has all the course codes based on the input file and searchValue/index
+void getQuery(int searchValue, char* inputFile, int index, char* outputFile) {
+  char *v1 = "code";
+  int i1 = searchValue;
+  char *v2 = inputFile;
+  int i2 = index;
+
+  int n1 = entries( v1 );
+  int n2 = entries( v2 );
+
+
+  char filename[BUFFER];
+
+  strcpy( filename, v1 );
+  strcat( filename, "_" );
+  strcat( filename, v2 );
+  strcat( filename, ".rel" );
+
+  FILE *fp = fopen( filename, "rb" );
+  char *array = malloc( n1*n2 );
+  fread( array, 1, n1*n2, fp );
+  fclose( fp );
+
+  fp = fopen( outputFile, "wb" );
+  if ( (i1==-1) && (i2>=0) )
+  {
+    for (int i=0;i<n1;i++)
+    {
+      int index = i*n2 +i2;
+      fwrite( array+index, 1, 1, fp );
+    }
+  }
+
+  if ( (i1>0) && (i2==-1) )
+  {
+    for (int j=0;j<n2;j++)
+    {
+      int index = i1*n2 + j;
+      fwrite( array+index, 1, 1, fp );
+    }
+  }
+
+  fclose( fp );
+}
+
 int main( int argc, char **argv ) {
   
   //value of indicies after hash_lookup()
@@ -70,7 +131,17 @@ int main( int argc, char **argv ) {
 
   // ---------- GET INDEX OF ROOM ---------- //
 
+  // ---------- SET FILE OF INDICES OF ALL COURSES IN BUILDING_INDEX ---------- //
 
+  getQuery(-1, "building", indexBuilding, "building.set"); 
+
+  // ---------- SET FILE OF INDICES OF ALL COURSES IN BUILDING_INDEX ---------- //
+
+  // ---------- SET FILE OF INDICES OF ALL COURSES IN ROOM_INDEX ---------- //
+
+  getQuery(-1, "room", indexRoom, "room.set"); 
+
+  // ---------- SET FILE OF INDICES OF ALL COURSES IN ROOM_INDEX ---------- //
 
 
 //   printf( “%s*%s %s %s - %s\n”, subject, courseno, days, from, to );
