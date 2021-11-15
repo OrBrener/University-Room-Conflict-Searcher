@@ -120,6 +120,9 @@ void and(char* setFile1, char* setFile2, char* outputFile) {
   fclose( fp3 );
 }
 
+//return the index from a file 
+//only for one line
+//used to read the subject/courseno/days/to/from values of each line in the intersection
 int set2Index_oneValue(char* filename) {
   char boolean;
 
@@ -134,6 +137,8 @@ int set2Index_oneValue(char* filename) {
   return -1;
 }
 
+
+//outputs the string value of the basename at index 
 char* getString(char* basenameInput, int index) {
   char *basename;
   int idx, idx2;
@@ -175,6 +180,9 @@ char* getString(char* basenameInput, int index) {
   return buffer;
 }
 
+//given command line arguments <buildingName> <roomNumber>
+//outputs all the courses that take place in the building and room number given
+//printf( “%s*%s %s %s - %s\n”, subject, courseno, days, from, to );
 int main( int argc, char **argv ) {
   
   //value of indicies after hash_lookup()
@@ -228,40 +236,70 @@ int main( int argc, char **argv ) {
 
   // ---------- SET FILE OF INDICES OF INTERSECTION OF BUILDING_FILE AND ROOM_FILE ---------- //
 
-  char boolean;
+  // ---------- GET ALL SUBJECT/COURSENO/DAYS/TO/FROM FROM THE INTERSECTION INDICIES ---------- //
 
+  //loop through the intersection indices
+  //for each index, get the subject/courseno/days/to/from
+  //convert it to string for the print function
+  //open the instersection file
   FILE *fp = fopen( intersectionFile, "rb" );
-
+  char boolean;
+  //for each index in the intersection file:
   for (int i=0; fread(&boolean,1,1,fp)==1; i++)
   {
+    //if the line is not empty:
     if (boolean) {
+      //for each course number:
+
+      // --- get the subject --- //
+      //get index of subject for code i
       getQuery(i, "subject", -1, "subject.set");
+      //convert that set (only 1 line) into an int index
       int subjectIndex = set2Index_oneValue("subject.set");
+      //get the string value of the subject name at index subjectIndex
       char* subject = getString("subject", subjectIndex);
       // printf("SUBJECT: %s\n", subject);
 
+      // --- get the course number --- //
+      //get index of course number for code i
       getQuery(i, "courseno", -1, "courseno.set");
+      //convert that set (only 1 line) into an int index
       int courseNumberIndex = set2Index_oneValue("courseno.set");
+      //get the string value of the course number name at index courseNumberIndex
       char* courseno = getString("courseno", courseNumberIndex);
       // printf("COURSENO: %s\n", courseno);
 
+      // --- get the days --- //
+      //get index of days for code i
       getQuery(i, "days", -1, "days.set");
+      //convert that set (only 1 line) into an int index
       int daysIndex = set2Index_oneValue("days.set");
+      //get the string value of the days name at index daysIndex
       char* days = getString("days", daysIndex);
       // printf("DAYS: %s\n", days);
 
+      // --- get the from --- //
+      //get index of from for code i
       getQuery(i, "from", -1, "from.set");
+      //convert that set (only 1 line) into an int index
       int fromIndex = set2Index_oneValue("from.set");
+      //get the string value of the from name at index fromIndex
       char* from = getString("from", fromIndex);
       // printf("FROM: %s\n", from);
 
+      // --- get the to --- //
+      //get index of to for code i
       getQuery(i, "to", -1, "to.set");
+      //convert that set (only 1 line) into an int index
       int toIndex = set2Index_oneValue("to.set");
+      //get the string value of the to name at index toIndex
       char* to = getString("to", toIndex);
       // printf("TO: %s\n", to);
 
+      //print based off the assignment requirements 
       printf( "%s*%s %s %s - %s\n", subject, courseno, days, from, to );
 
+      //free each of the malloc'd char* variables
       free(subject);
       free(courseno);
       free(days);
@@ -270,7 +308,12 @@ int main( int argc, char **argv ) {
     }
   }
 
+  // ---------- GET ALL SUBJECT/COURSENO/DAYS/TO/FROM FROM THE INTERSECTION INDICIES ---------- //
+
+  // ---------- LAST 20% FUNTONALITY ---------- //
 
 
+  // ---------- LAST 20% FUNTONALITY ---------- //
+  
   return 0;
 } 
