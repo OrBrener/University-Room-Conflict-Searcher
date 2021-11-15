@@ -101,6 +101,25 @@ void getQuery(int searchValue, char* inputFile, int index, char* outputFile) {
   fclose( fp );
 }
 
+//step 5
+//create an output set file that is the intersection of setFile1 and setFile2
+void and(char* setFile1, char* setFile2, char* outputFile) {
+  FILE *fp1 = fopen( setFile1, "rb" );
+  FILE *fp2 = fopen( setFile2, "rb" );
+  FILE *fp3 = fopen( outputFile, "wb" );
+  char b1, b2, b3;
+
+  while ( fread( &b1, 1, 1, fp1 )==1 && fread( &b2, 1, 1, fp2 ) )
+  {
+    b3 = b1&&b2;
+    fwrite( &b3, 1, 1, fp3 );
+  }
+
+  fclose( fp1 );
+  fclose( fp2 );
+  fclose( fp3 );
+}
+
 int main( int argc, char **argv ) {
   
   //value of indicies after hash_lookup()
@@ -108,8 +127,12 @@ int main( int argc, char **argv ) {
   long indexRoom;
 
   //the building and room value given by argv[1] & argv[2]
-  char *buildingValue = argv[1];
-  char *roomValue = argv[2];
+  char* buildingValue = argv[1];
+  char* roomValue = argv[2];
+
+  char* buildingFile = "building.set";
+  char* roomFile = "file.set";
+  char* intersectionFile = "intersection.set";
 
   //make sure user inputs the correct command line (+ arguments)
   if (argc!=3) {
@@ -133,16 +156,21 @@ int main( int argc, char **argv ) {
 
   // ---------- SET FILE OF INDICES OF ALL COURSES IN BUILDING_INDEX ---------- //
 
-  getQuery(-1, "building", indexBuilding, "building.set"); 
+  getQuery(-1, "building", indexBuilding, buildingFile); 
 
   // ---------- SET FILE OF INDICES OF ALL COURSES IN BUILDING_INDEX ---------- //
 
   // ---------- SET FILE OF INDICES OF ALL COURSES IN ROOM_INDEX ---------- //
 
-  getQuery(-1, "room", indexRoom, "room.set"); 
+  getQuery(-1, "room", indexRoom, roomFile); 
 
   // ---------- SET FILE OF INDICES OF ALL COURSES IN ROOM_INDEX ---------- //
 
+  // ---------- SET FILE OF INDICES OF INTERSECTION OF BUILDING_FILE AND ROOM_FILE ---------- //
+  
+  and(buildingFile, roomFile, intersectionFile);
+
+  // ---------- SET FILE OF INDICES OF INTERSECTION OF BUILDING_FILE AND ROOM_FILE ---------- //
 
 //   printf( “%s*%s %s %s - %s\n”, subject, courseno, days, from, to );
 
