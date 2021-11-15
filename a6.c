@@ -4,28 +4,51 @@
 
 #include "hash.h"
 
-int main( int argc, char **argv ) {
+
+//steps 1 & 2
+//get index of value in filename
+//returns the index received from hash_lookup
+long getIndex(char* filename, char* value) {
   
-  //filenames
+  //initialize
   char idxname[BUFFER];
   char txtname[BUFFER];
+  long hash_table[ HASHSIZE ];
+
+  // identify text file name
+  strcpy( idxname, filename );
+  strcat( idxname, ".idx" );
+  strcpy( txtname, filename );
+  strcat( txtname, ".txt" );
+
+  // load hashtable from file into memory
+  get_hashtable( filename, hash_table );
+
+  // open text file
+  FILE *idxfile = fopen( idxname, "r" );
+  FILE *txtfile = fopen( txtname, "r" );
+
+  // get result of hash_lookup
+  long index = hash_lookup( value, hash_table, idxfile, txtfile );
+  
+  //close the file
+  fclose( idxfile );
+  fclose( txtfile );
+
+  //return the value
+  return index;
+
+}
+
+int main( int argc, char **argv ) {
   
   //value of indicies after hash_lookup()
   long indexBuilding;
   long indexRoom;
 
-  //file to be opened
-  char *basename1 = "building";
-  char *basename2 = "room";
-
   //the building and room value given by argv[1] & argv[2]
-  char *buildingValue;
-  char *roomValue;
-
-  FILE *idxfile;
-  FILE *txtfile;
-
-  long hash_table[ HASHSIZE ];
+  char *buildingValue = argv[1];
+  char *roomValue = argv[2];
 
   //make sure user inputs the correct command line (+ arguments)
   if (argc!=3) {
@@ -33,58 +56,17 @@ int main( int argc, char **argv ) {
     exit(-1);
   }
 
-  // target values
-  buildingValue = argv[1];
-  roomValue = argv[2];
-
   // ---------- GET INDEX OF BUILDING ---------- //
 
-  // identify text file name
-  strcpy( idxname, basename1 );
-  strcat( idxname, ".idx" );
-  strcpy( txtname, basename1 );
-  strcat( txtname, ".txt" );
-
-
-  // load hashtable from file into memory
-  get_hashtable( basename1, hash_table );
-
-  // open text file
-  idxfile = fopen( idxname, "r" );
-  txtfile = fopen( txtname, "r" );
-
-  // get result of hash_lookup
-  indexBuilding = hash_lookup( buildingValue, hash_table, idxfile, txtfile );
+  indexBuilding = getIndex("building", buildingValue);
   printf( "Index of building %s: %ld\n",buildingValue, indexBuilding );
-
-  //close the file
-  fclose( idxfile );
-  fclose( txtfile );
 
   // ---------- GET INDEX OF BUILDING ---------- //
 
   // ---------- GET INDEX OF ROOM ---------- //
 
-  // identify text file name
-  strcpy( idxname, basename2 );
-  strcat( idxname, ".idx" );
-  strcpy( txtname, basename2 );
-  strcat( txtname, ".txt" );
-
-
-  // load hashtable from file into memory
-  get_hashtable( basename2, hash_table );
-
-  // open text file
-  idxfile = fopen( idxname, "r" );
-  txtfile = fopen( txtname, "r" );
-
-  // get result of hash_lookup
-  indexRoom = hash_lookup( roomValue, hash_table, idxfile, txtfile );
+  indexRoom = getIndex("room", roomValue);
   printf( "Index of room %s: %ld\n", roomValue, indexRoom );
-
-  fclose( idxfile );
-  fclose( txtfile );
 
   // ---------- GET INDEX OF ROOM ---------- //
 
