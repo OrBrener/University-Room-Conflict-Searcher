@@ -4,7 +4,7 @@
 
 #include "hash.h"
 
-// TO TEST RUN:
+// TO TEST, RUN:
 //make
 //./a6 ALEX 200 > test/output.txt
 //diff -e test/output.txt test/expectedOutput_80%.txt && echo $'\nCOREECT OUTPUT\n'
@@ -148,7 +148,6 @@ int set2Index_oneValue(char* filename) {
 
   return -1;
 }
-
 
 //outputs the string value of the basename at index 
 char* getString(char* basenameInput, int index) {
@@ -344,8 +343,7 @@ int main( int argc, char **argv ) {
   FILE *fp = fopen( intersectionFile, "rb" );
   char boolean;
   //for each index in the intersection file:
-  for (int i=0; fread(&boolean,1,1,fp)==1; i++)
-  {
+  for (int i=0; fread(&boolean,1,1,fp)==1; i++) {
     //if the line is not empty:
     if (boolean) {
       //for each course number:
@@ -354,7 +352,7 @@ int main( int argc, char **argv ) {
       char* subject = getElementForPrint(i, "subject", "subject.set");
 
       // --- get the course number --- //
-      char* courseno = getElementForPrint(i, "courseno", "courseno.set");
+      char* courseNumber = getElementForPrint(i, "courseno", "courseno.set");
 
       // --- get the days --- //
       char* days = getElementForPrint(i, "days", "days.set");
@@ -366,11 +364,11 @@ int main( int argc, char **argv ) {
       char* to = getElementForPrint(i, "to", "to.set");
 
       //print based off the assignment requirements 
-      printf( "%s*%s %s %s - %s\n",subject, courseno, days, from, to );
+      printf( "%s*%s %s %s - %s\n",subject, courseNumber, days, from, to );
 
       //free each of the malloc'd char* variables
       free(subject);
-      free(courseno);
+      free(courseNumber);
       free(days);
       free(from);
       free(to);
