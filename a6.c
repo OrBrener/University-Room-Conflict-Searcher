@@ -8,6 +8,8 @@
 //make
 //./a6 ALEX 200 > test/output.txt
 //diff -e test/output.txt test/expectedOutput_80%.txt && echo $'\nCOREECT OUTPUT\n'
+//or in one command:
+//make && ./a6 ALEX 200 > test/output.txt && diff -e test/output.txt test/expectedOutput_80%.txt && echo $'\nCOREECT OUTPUT\n'
 
 //steps 1 & 2
 //get index of value in filename
@@ -234,9 +236,23 @@ struct Set *empty(int capacity){
 }
 
 int is_member(struct Set *ptr, char* element) {
-  // int hash_idx = str2int(element, ptr->capacity);
+  int hash_idx = str2int(element, ptr->capacity);
+  
+  int i;
+  i = hash_idx;
 
-  // for (int i = 0; )
+  do {
+    if (ptr->table[i]) {
+      if (strcmp(element, ptr->table[i]) == 0) {
+        return 1;
+      }
+    }
+    i++;
+    if (i == ptr->capacity) {
+      i = 0;
+    }
+  } while (i != hash_idx);
+
 
   return 0;
 }
@@ -336,6 +352,9 @@ int main( int argc, char **argv ) {
 
   noDuplicates = empty(sizeOfIntersection);
 
+  char elementForSet[sizeOfIntersection][7];
+  int noDuplicatesCounter = 0;
+
   //loop through the intersection indices
   //for each index, get the subject/courseno/days/to/from
   //convert it to string for the print function
@@ -352,7 +371,7 @@ int main( int argc, char **argv ) {
       char* subject = getElementForPrint(i, "subject", "subject.set");
 
       // --- get the course number --- //
-      char* courseNumber = getElementForPrint(i, "courseno", "courseno.set");
+      char* courseno = getElementForPrint(i, "courseno", "courseno.set");
 
       // --- get the days --- //
       char* days = getElementForPrint(i, "days", "days.set");
@@ -363,15 +382,29 @@ int main( int argc, char **argv ) {
       // --- get the to --- //
       char* to = getElementForPrint(i, "to", "to.set");
 
-      //print based off the assignment requirements 
-      printf( "%s*%s %s %s - %s\n",subject, courseNumber, days, from, to );
+      if (is_member(noDuplicates, courseno)) {
+        //free each of the malloc'd char* variables
+        free(subject);
+        free(courseno);
+        free(days);
+        free(from);
+        free(to);
+      }
 
-      //free each of the malloc'd char* variables
-      free(subject);
-      free(courseNumber);
-      free(days);
-      free(from);
-      free(to);
+      else {
+        strcpy(elementForSet[noDuplicatesCounter], courseno);
+        add_element(noDuplicates, elementForSet[noDuplicatesCounter]);
+        noDuplicatesCounter++;
+
+        free(subject);
+        free(courseno);
+        free(days);
+        free(from);
+        free(to);
+      }
+
+      //print based off the assignment requirements 
+      // printf( "%s*%s %s %s - %s\n",subject, courseno, days, from, to );
     }
   }
 
@@ -379,6 +412,7 @@ int main( int argc, char **argv ) {
 
   // ---------- LAST 20% FUNTONALITY ---------- //
 
+  // print_set(noDuplicates);
 
   // ---------- LAST 20% FUNTONALITY ---------- //
   
