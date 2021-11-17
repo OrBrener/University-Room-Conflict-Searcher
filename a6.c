@@ -103,21 +103,29 @@ void getQuery(int searchValue, char* inputFile, int index, char* outputFile) {
 
 //step 5
 //create an output set file that is the intersection of setFile1 and setFile2
-void and(char* setFile1, char* setFile2, char* outputFile) {
+int and(char* setFile1, char* setFile2, char* outputFile) {
   FILE *fp1 = fopen( setFile1, "rb" );
   FILE *fp2 = fopen( setFile2, "rb" );
   FILE *fp3 = fopen( outputFile, "wb" );
   char b1, b2, b3;
 
+  int sizeOfIntersection = 0;
+
   while ( fread( &b1, 1, 1, fp1 )==1 && fread( &b2, 1, 1, fp2 ) )
   {
     b3 = b1&&b2;
     fwrite( &b3, 1, 1, fp3 );
+    if (b3 == 1) {
+      sizeOfIntersection++;
+    }
+
   }
 
   fclose( fp1 );
   fclose( fp2 );
   fclose( fp3 );
+
+  return sizeOfIntersection;
 }
 
 //return the index from a file 
@@ -175,9 +183,78 @@ char* getString(char* basenameInput, int index) {
   fgets( buffer, BUFFER, fptxt );
   fclose( fptxt );
 
-  buffer[strlen(buffer)-1 ] = '\0';
+  buffer[strlen(buffer)-1] = '\0';
 
   return buffer;
+}
+
+struct Set {
+  int capacity;
+  char** table;
+};
+
+struct Set *empty(int capacity){
+    struct Set *ptr;
+
+    ptr = malloc(sizeof(struct Set));
+    if(!ptr){
+        fprintf(stderr, "Malloc failed\n");
+        exit(-1);
+    }
+
+    ptr -> capacity = capacity;
+    ptr -> table = malloc(sizeof(char *) * capacity);
+
+    if(!ptr->table){
+        fprintf(stderr, "Malloc failed\n");
+        exit(-1);
+    }
+
+    for(int i = 0; i < capacity; i++){
+        ptr -> table[i] = NULL;
+    }
+
+    return ptr;
+}
+
+int is_member(struct Set *ptr, char* element) {
+  // int hash_idx = str2int(element, ptr->capacity);
+
+  // for (int i = 0; )
+
+  return 0;
+}
+
+void add_element(struct Set *ptr, char *element){
+    if (is_member(ptr, element)){
+        return;
+    }
+
+    int hash_idx = str2int(element, ptr -> capacity);
+
+    while (ptr -> table[hash_idx]){
+        hash_idx++;
+        if (hash_idx == ptr -> capacity){
+            hash_idx = 0;
+        }
+    }
+
+    ptr -> table[hash_idx] = element; 
+}
+
+void print_set(struct Set *ptr){
+    printf("{ ");
+    for (int i = 0; i < ptr -> capacity; i++){
+        if (ptr -> table[i]){
+            printf("%s, ", ptr -> table[i]);
+        }
+    }
+    printf("\b\b }");
+}
+
+void free_set(struct Set *ptr){
+    free(ptr -> table);
+    free(ptr);
 }
 
 //given command line arguments <buildingName> <roomNumber>
@@ -197,6 +274,9 @@ int main( int argc, char **argv ) {
   char* roomFile = "file.set";
   char* intersectionFile = "intersection.set";
 
+  int sizeOfIntersection = 0;  
+
+  struct Set* noDuplicates;
 
   //make sure user inputs the correct command line (+ arguments)
   if (argc!=3) {
@@ -232,11 +312,13 @@ int main( int argc, char **argv ) {
 
   // ---------- SET FILE OF INDICES OF INTERSECTION OF BUILDING_FILE AND ROOM_FILE ---------- //
   
-  and(buildingFile, roomFile, intersectionFile);
+  sizeOfIntersection = and(buildingFile, roomFile, intersectionFile);
 
   // ---------- SET FILE OF INDICES OF INTERSECTION OF BUILDING_FILE AND ROOM_FILE ---------- //
 
   // ---------- GET ALL SUBJECT/COURSENO/DAYS/TO/FROM FROM THE INTERSECTION INDICIES ---------- //
+
+  noDuplicates = empty(sizeOfIntersection);
 
   //loop through the intersection indices
   //for each index, get the subject/courseno/days/to/from
@@ -297,7 +379,7 @@ int main( int argc, char **argv ) {
       // printf("TO: %s\n", to);
 
       //print based off the assignment requirements 
-      printf( "%s*%s %s %s - %s\n", subject, courseno, days, from, to );
+      printf( "%s*%s %s %s - %s\n",subject, courseno, days, from, to );
 
       //free each of the malloc'd char* variables
       free(subject);
