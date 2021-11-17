@@ -4,6 +4,10 @@
 
 #include "hash.h"
 
+// TO TEST RUN:
+//make
+//./a6 ALEX 200 > test/output.txt
+//diff -e test/output.txt test/expectedOutput_80%.txt && echo $'\nCOREECT OUTPUT\n'
 
 //steps 1 & 2
 //get index of value in filename
@@ -188,6 +192,19 @@ char* getString(char* basenameInput, int index) {
   return buffer;
 }
 
+char* getElementForPrint(int index, char* elementName, char* setName) {
+
+  //get index of teh element for code i
+  getQuery(index, elementName, -1, setName);
+  //convert that set (only 1 line) into an int index
+  int elementIndex = set2Index_oneValue(setName);
+  //get the string value of the element name at index elementIndex
+  char* element = getString(elementName, elementIndex);
+  // printf("%s: %s\n", elementName, element);
+
+  return element;
+}
+
 struct Set {
   int capacity;
   char** table;
@@ -334,49 +351,19 @@ int main( int argc, char **argv ) {
       //for each course number:
 
       // --- get the subject --- //
-      //get index of subject for code i
-      getQuery(i, "subject", -1, "subject.set");
-      //convert that set (only 1 line) into an int index
-      int subjectIndex = set2Index_oneValue("subject.set");
-      //get the string value of the subject name at index subjectIndex
-      char* subject = getString("subject", subjectIndex);
-      // printf("SUBJECT: %s\n", subject);
+      char* subject = getElementForPrint(i, "subject", "subject.set");
 
       // --- get the course number --- //
-      //get index of course number for code i
-      getQuery(i, "courseno", -1, "courseno.set");
-      //convert that set (only 1 line) into an int index
-      int courseNumberIndex = set2Index_oneValue("courseno.set");
-      //get the string value of the course number name at index courseNumberIndex
-      char* courseno = getString("courseno", courseNumberIndex);
-      // printf("COURSENO: %s\n", courseno);
+      char* courseno = getElementForPrint(i, "courseno", "courseno.set");
 
       // --- get the days --- //
-      //get index of days for code i
-      getQuery(i, "days", -1, "days.set");
-      //convert that set (only 1 line) into an int index
-      int daysIndex = set2Index_oneValue("days.set");
-      //get the string value of the days name at index daysIndex
-      char* days = getString("days", daysIndex);
-      // printf("DAYS: %s\n", days);
+      char* days = getElementForPrint(i, "days", "days.set");
 
       // --- get the from --- //
-      //get index of from for code i
-      getQuery(i, "from", -1, "from.set");
-      //convert that set (only 1 line) into an int index
-      int fromIndex = set2Index_oneValue("from.set");
-      //get the string value of the from name at index fromIndex
-      char* from = getString("from", fromIndex);
-      // printf("FROM: %s\n", from);
+      char* from = getElementForPrint(i, "from", "form.set");
 
       // --- get the to --- //
-      //get index of to for code i
-      getQuery(i, "to", -1, "to.set");
-      //convert that set (only 1 line) into an int index
-      int toIndex = set2Index_oneValue("to.set");
-      //get the string value of the to name at index toIndex
-      char* to = getString("to", toIndex);
-      // printf("TO: %s\n", to);
+      char* to = getElementForPrint(i, "to", "to.set");
 
       //print based off the assignment requirements 
       printf( "%s*%s %s %s - %s\n",subject, courseno, days, from, to );
