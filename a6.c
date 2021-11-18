@@ -289,6 +289,77 @@ void free_set(struct Set *ptr){
     free(ptr);
 }
 
+void getInfoIntoClass(char classes[][4][8], int index, char* subject, char* courseno, char* from, char* to){
+    strcpy(classes[index][0], subject);
+    strcpy(classes[index][1], courseno);
+    strcpy(classes[index][2], from);
+    strcpy(classes[index][3], to);
+}
+
+void orderedClasses(char classes[][4][8], int counter) {
+    char swapSubject[5];
+    char swapCourseno[5];
+    char swapFrom[8];
+    char swapTo[8];
+
+    int swap = 0;
+
+    for (int i = 0; i < counter - 1; i++){
+        for (int j = 0; j < counter - i - 1; j++){
+            if (classes[j][2][5] == 'P' && classes[j+1][2][5] == 'A'){
+                swap = 1;
+            }
+
+            else if (classes[j][2][5] == classes[j+1][2][5]){
+
+                if ((classes[j][2][0] == '1' && classes[j][2][1] == '2') && (classes[j+1][2][0] != '1' || classes[j+1][2][1] != '2')){
+                    swap = 0;
+                }
+                else if ((classes[j][2][0] != '1' || classes[j][2][1] != '2') && (classes[j+1][2][0] == '1' && classes[j+1][2][1] == '2')){
+                    swap = 1;
+                }
+
+                else{
+                    for (int k = 0; k < 5; k++){
+                        if (classes[j][2][k] > classes[j+1][2][k]){
+                            swap = 1;
+                            break;
+                        }
+                        else if (classes[j][2][k] < classes[j+1][2][k]){
+                            break;
+                        }
+                    }
+                }
+
+                
+            }
+
+            if (swap == 1){
+                strcpy(swapSubject, classes[j][0]);
+                strcpy(swapCourseno, classes[j][1]);
+                strcpy(swapFrom, classes[j][2]);
+                strcpy(swapTo, classes[j][3]);
+
+                strcpy(classes[j][0], classes[j+1][0]);
+                strcpy(classes[j][1], classes[j+1][1]);
+                strcpy(classes[j][2], classes[j+1][2]);
+                strcpy(classes[j][3], classes[j+1][3]);
+
+                strcpy(classes[j+1][0], swapSubject);
+                strcpy(classes[j+1][1], swapCourseno);
+                strcpy(classes[j+1][2], swapFrom);
+                strcpy(classes[j+1][3], swapTo);
+            }
+            swap = 0;
+        }
+    }
+}
+
+void printClass(char* dayOfTheWeek, char class[][4][8], int counter) {
+    for (int i = 0; i < counter; i++){
+        printf("%s*%s %s %s - %s\n", class[i][0], class[i][1], dayOfTheWeek, class[i][2], class[i][3]);
+    }
+}
 //given command line arguments <buildingName> <roomNumber>
 //outputs all the courses that take place in the building and room number given
 //printf( “%s*%s %s %s - %s\n”, subject, courseno, days, from, to );
@@ -355,6 +426,20 @@ int main( int argc, char **argv ) {
   char elementForSet[sizeOfIntersection][7];
   int noDuplicatesCounter = 0;
 
+  char mondayClasses[sizeOfIntersection][4][8];
+  char tuesdayClasses[sizeOfIntersection][4][8];
+  char wednesdayClasses[sizeOfIntersection][4][8];
+  char thursdayClasses[sizeOfIntersection][4][8];
+  char fridayClasses[sizeOfIntersection][4][8];
+  char saturdayClasses[sizeOfIntersection][4][8];
+
+  int mondayClassesCounter = 0;
+  int tuesdayClassesCounter = 0;
+  int wednesdayClassesCounter = 0;
+  int thursdayClassesCounter = 0;
+  int fridayClassesCounter = 0;
+  int saturdayClassesCounter = 0;  
+
   //loop through the intersection indices
   //for each index, get the subject/courseno/days/to/from
   //convert it to string for the print function
@@ -389,24 +474,120 @@ int main( int argc, char **argv ) {
         free(days);
         free(from);
         free(to);
-      }
+      } 
 
       else {
         strcpy(elementForSet[noDuplicatesCounter], courseno);
         add_element(noDuplicates, elementForSet[noDuplicatesCounter]);
         noDuplicatesCounter++;
 
+        char* firstLetterPointer = &days[0];
+        int lastDay = 0; 
+
+        if (*firstLetterPointer == 'M') {
+          getInfoIntoClass(mondayClasses, mondayClassesCounter, subject, courseno, from, to);
+
+          mondayClassesCounter++;
+
+          if (*(firstLetterPointer + 3) == ',') {
+            firstLetterPointer += 5; 
+          }
+          else {
+            lastDay = 1;
+          }
+        }
+
+        if (*firstLetterPointer == 'T' && *(firstLetterPointer + 1) == 'u' && lastDay == 0) {
+          getInfoIntoClass(tuesdayClasses, tuesdayClassesCounter, subject, courseno, from, to);
+
+          tuesdayClassesCounter++;
+
+          if (*(firstLetterPointer + 4) == ',') {
+            firstLetterPointer += 6; 
+          }
+          else {
+            lastDay = 1;
+          }
+        }
+
+        if (*firstLetterPointer == 'W' && lastDay == 0) {
+          getInfoIntoClass(wednesdayClasses, wednesdayClassesCounter, subject, courseno, from, to);
+
+          wednesdayClassesCounter++;
+
+          if (*(firstLetterPointer + 3) == ',') {
+            firstLetterPointer += 5; 
+          }
+          else {
+            lastDay = 1;
+          }
+        }
+
+        if (*firstLetterPointer == 'T' && *(firstLetterPointer + 1) == 'h' && lastDay == 0) {
+          getInfoIntoClass(thursdayClasses, thursdayClassesCounter, subject, courseno, from, to);
+
+
+          thursdayClassesCounter++;
+
+          if (*(firstLetterPointer + 4) == ',') {
+            firstLetterPointer += 6; 
+          }
+          else {
+            lastDay = 1;
+          }
+        }
+
+        if (*firstLetterPointer == 'F' && lastDay == 0) {
+          getInfoIntoClass(fridayClasses, fridayClassesCounter, subject, courseno, from, to);
+
+
+          fridayClassesCounter++;
+
+          if (*(firstLetterPointer + 3) == ',') {
+            firstLetterPointer += 5; 
+          }
+          else {
+            lastDay = 1;
+          }
+        }
+
+        if (*firstLetterPointer == 'S' && lastDay == 0) {
+          getInfoIntoClass(saturdayClasses, saturdayClassesCounter, subject, courseno, from, to);
+
+          saturdayClassesCounter++;
+        }
+
         free(subject);
         free(courseno);
         free(days);
         free(from);
         free(to);
-      }
-
-      //print based off the assignment requirements 
-      // printf( "%s*%s %s %s - %s\n",subject, courseno, days, from, to );
+      } 
     }
   }
+
+    orderedClasses(mondayClasses, mondayClassesCounter);
+
+    orderedClasses(tuesdayClasses, tuesdayClassesCounter);
+
+    orderedClasses(wednesdayClasses, wednesdayClassesCounter);
+
+    orderedClasses(thursdayClasses, thursdayClassesCounter);
+
+    orderedClasses(fridayClasses, fridayClassesCounter);
+
+    orderedClasses(saturdayClasses, saturdayClassesCounter);
+
+    printClass("Mon", mondayClasses, mondayClassesCounter);
+    printClass("Tues", tuesdayClasses, tuesdayClassesCounter);
+    printClass("Wed", wednesdayClasses, wednesdayClassesCounter);
+    printClass("Thur", thursdayClasses, thursdayClassesCounter);
+    printClass("Fri", fridayClasses, fridayClassesCounter);
+    printClass("Sat", saturdayClasses, saturdayClassesCounter);
+
+
+    free_set(noDuplicates);
+
 
   // ---------- GET ALL SUBJECT/COURSENO/DAYS/TO/FROM FROM THE INTERSECTION INDICIES ---------- //
 
@@ -415,6 +596,5 @@ int main( int argc, char **argv ) {
   // print_set(noDuplicates);
 
   // ---------- LAST 20% FUNTONALITY ---------- //
-  
   return 0;
 } 
