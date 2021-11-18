@@ -360,9 +360,12 @@ void printClass(char* dayOfTheWeek, char class[][4][8], int counter) {
         printf("%s*%s %s %s - %s\n", class[i][0], class[i][1], dayOfTheWeek, class[i][2], class[i][3]);
     }
 }
+
 //given command line arguments <buildingName> <roomNumber>
 //outputs all the courses that take place in the building and room number given
 //printf( “%s*%s %s %s - %s\n”, subject, courseno, days, from, to );
+//for additional functionality; gets rid of all duplicate entries 
+//and prints the info based of the days of the week and start time
 int main( int argc, char **argv ) {
   
   //value of indicies after hash_lookup()
@@ -373,12 +376,15 @@ int main( int argc, char **argv ) {
   char* buildingValue = argv[1];
   char* roomValue = argv[2];
 
+  //file name constants
   char* buildingFile = "building.set";
   char* roomFile = "file.set";
   char* intersectionFile = "intersection.set";
 
+  //number of elements in the intersection file
   int sizeOfIntersection = 0;  
 
+  //set used to get rid of duplicate entries
   struct Set* noDuplicates;
 
   //make sure user inputs the correct command line (+ arguments)
@@ -392,40 +398,36 @@ int main( int argc, char **argv ) {
   indexBuilding = getIndex("building", buildingValue);
   // printf( "Index of building %s: %ld\n",buildingValue, indexBuilding );
 
-  // ---------- GET INDEX OF BUILDING ---------- //
-
   // ---------- GET INDEX OF ROOM ---------- //
 
   indexRoom = getIndex("room", roomValue);
   // printf( "Index of room %s: %ld\n", roomValue, indexRoom );
 
-  // ---------- GET INDEX OF ROOM ---------- //
-
   // ---------- SET FILE OF INDICES OF ALL COURSES IN BUILDING_INDEX ---------- //
 
   getQuery(-1, "building", indexBuilding, buildingFile); 
-
-  // ---------- SET FILE OF INDICES OF ALL COURSES IN BUILDING_INDEX ---------- //
 
   // ---------- SET FILE OF INDICES OF ALL COURSES IN ROOM_INDEX ---------- //
 
   getQuery(-1, "room", indexRoom, roomFile); 
 
-  // ---------- SET FILE OF INDICES OF ALL COURSES IN ROOM_INDEX ---------- //
-
   // ---------- SET FILE OF INDICES OF INTERSECTION OF BUILDING_FILE AND ROOM_FILE ---------- //
   
   sizeOfIntersection = and(buildingFile, roomFile, intersectionFile);
 
-  // ---------- SET FILE OF INDICES OF INTERSECTION OF BUILDING_FILE AND ROOM_FILE ---------- //
+  // ---------- VARIABLES USED FOR THE LAST 20% FUNTONALITY ---------- //
 
-  // ---------- GET ALL SUBJECT/COURSENO/DAYS/TO/FROM FROM THE INTERSECTION INDICIES ---------- //
-
+  //set that has all classes without duplicates
+  //make it size of intersection because it needs to be statically allocated memory 
+  //at most will have all elements in the intersection (there is actually no duplicates)
   noDuplicates = empty(sizeOfIntersection);
 
+  //courseno used to add to the noDuplicates
   char elementForSet[sizeOfIntersection][7];
+  //number of elements in the noDuplicate set
   int noDuplicatesCounter = 0;
 
+  //string array for each class info part (subject, courseno, to, from) for each day of the week
   char mondayClasses[sizeOfIntersection][4][8];
   char tuesdayClasses[sizeOfIntersection][4][8];
   char wednesdayClasses[sizeOfIntersection][4][8];
@@ -433,6 +435,7 @@ int main( int argc, char **argv ) {
   char fridayClasses[sizeOfIntersection][4][8];
   char saturdayClasses[sizeOfIntersection][4][8];
 
+  //counter for the number of classes in each day of the week
   int mondayClassesCounter = 0;
   int tuesdayClassesCounter = 0;
   int wednesdayClassesCounter = 0;
@@ -450,6 +453,9 @@ int main( int argc, char **argv ) {
   for (int i=0; fread(&boolean,1,1,fp)==1; i++) {
     //if the line is not empty:
     if (boolean) {
+
+      // ---------- GET ALL SUBJECT/COURSENO/DAYS/TO/FROM FROM THE INTERSECTION INDICIES ---------- //
+
       //for each course number:
 
       // --- get the subject --- //
@@ -461,12 +467,19 @@ int main( int argc, char **argv ) {
       // --- get the days --- //
       char* days = getElementForPrint(i, "days", "days.set");
 
-      // --- get the from --- //
+      // --- get the from time --- //
       char* from = getElementForPrint(i, "from", "form.set");
 
-      // --- get the to --- //
+      // --- get the to time --- //
       char* to = getElementForPrint(i, "to", "to.set");
 
+      // ---------- LAST 20% FUNTONALITY ---------- //
+
+      // ---------- GET RID OF DUPLICATES ---------- //
+      
+      //if the class is already in the set:
+      //do not add it to the set:
+      //so you can free all the local variables
       if (is_member(noDuplicates, courseno)) {
         //free each of the malloc'd char* variables
         free(subject);
@@ -475,70 +488,119 @@ int main( int argc, char **argv ) {
         free(from);
         free(to);
       } 
-
+      //otherwise:
+      //it is a unique class
       else {
+        //add the class to the set
         strcpy(elementForSet[noDuplicatesCounter], courseno);
         add_element(noDuplicates, elementForSet[noDuplicatesCounter]);
         noDuplicatesCounter++;
 
+        // ---------- PARTITION CLASSES BASED OFF DAYS OF THE WEEK ---------- //
+
+        //use pointer arithmetic to check what day of the week it belongs to
         char* firstLetterPointer = &days[0];
+        //boolean: 0 = there are still more days of the week this class is in
         int lastDay = 0; 
 
+        //input days are ordered 
+        
+        //if in Monday:
         if (*firstLetterPointer == 'M') {
+          //add to the Monday class array 
           getInfoIntoClass(mondayClasses, mondayClassesCounter, subject, courseno, from, to);
           mondayClassesCounter++;
+
+          //if there is a another day the class takes place:
+          //3 because "Mon,"
           if (*(firstLetterPointer + 3) == ',') {
+            //5 because "Mon, x"
             firstLetterPointer += 5; 
           }
+          //otherwise: no other days for the class
           else {
             lastDay = 1;
           }
         }
+
+        //if in Tuesday:
         if (*firstLetterPointer == 'T' && *(firstLetterPointer + 1) == 'u' && lastDay == 0) {
+          //add to the Tuesday class array
           getInfoIntoClass(tuesdayClasses, tuesdayClassesCounter, subject, courseno, from, to);
           tuesdayClassesCounter++;
+
+          //if there is a another day the class takes place:
+          //4 because "Tues,"
           if (*(firstLetterPointer + 4) == ',') {
+            //6 because "Tues, x"
             firstLetterPointer += 6; 
           }
+          //otherwise: no other days for the class
           else {
             lastDay = 1;
           }
         }
+        //if in Wednesday:
         if (*firstLetterPointer == 'W' && lastDay == 0) {
+          //add to the Wednesday class array
           getInfoIntoClass(wednesdayClasses, wednesdayClassesCounter, subject, courseno, from, to);
           wednesdayClassesCounter++;
+
+          //if there is a another day the class takes place:
+          //3 because "Wed,"
           if (*(firstLetterPointer + 3) == ',') {
+            //5 because "Wed, x"
             firstLetterPointer += 5; 
           }
+          //otherwise: no other days for the class
           else {
             lastDay = 1;
           }
         }
+        //if in Thursday
         if (*firstLetterPointer == 'T' && *(firstLetterPointer + 1) == 'h' && lastDay == 0) {
+          //add to the Thursday class array
           getInfoIntoClass(thursdayClasses, thursdayClassesCounter, subject, courseno, from, to);
           thursdayClassesCounter++;
+
+          //if there is a another day the class takes place:
+          //4 because "Thurs,"
           if (*(firstLetterPointer + 4) == ',') {
+            //5 because "Thurs, x"
             firstLetterPointer += 6; 
           }
+          //otherwise: no other days for the class
           else {
             lastDay = 1;
           }
         }
+        //if in Friday
         if (*firstLetterPointer == 'F' && lastDay == 0) {
+          //add to the Friday class array
           getInfoIntoClass(fridayClasses, fridayClassesCounter, subject, courseno, from, to);
           fridayClassesCounter++;
+
+          //if there is a another day the class takes place:
+          //3 because "Fri,"
           if (*(firstLetterPointer + 3) == ',') {
+            //5 because "Fri, x"
             firstLetterPointer += 5; 
           }
           else {
+            //otherwise: no other days for the class
             lastDay = 1;
           }
         }
+        //if in Saturday
         if (*firstLetterPointer == 'S' && lastDay == 0) {
+          //add to the Saturday class array
           getInfoIntoClass(saturdayClasses, saturdayClassesCounter, subject, courseno, from, to);
           saturdayClassesCounter++;
         }
+        //Saturday is the last possible day therefore we finish
 
+        //finished adding the class to set and classes
+        //can now free the local variable
         free(subject);
         free(courseno);
         free(days);
@@ -548,9 +610,21 @@ int main( int argc, char **argv ) {
     }
   }
 
-  char allClasses[6][sizeOfIntersection][4][8];
+  //free the allocated spacec for the noDuplicates set
+  free_set(noDuplicates);
+
+  // ---------- ORGANIZE BY TIME ---------- //
+
+  // ---------- VARIABLES USED FOR ORGANIZING BY TIME ---------- //
+
+  //2D array of number of classes in each day of the week
   int allCounters[6] = {mondayClassesCounter, tuesdayClassesCounter, wednesdayClassesCounter, thursdayClassesCounter, fridayClassesCounter, saturdayClassesCounter};
 
+  //4D array of all classes for each day of the week
+  char allClasses[6][sizeOfIntersection][4][8];
+
+  //need to use strcpy for "strings" in c
+  //for each dimension of the array
   for (int i = 0; i < 5; i++) {
     for (int j = 0; j<allCounters[i]; j++) {
       for (int k = 0; k<4; k++) {
@@ -569,20 +643,14 @@ int main( int argc, char **argv ) {
 
   char* allDays[6] = {"Mon", "Tues", "Wed", "Thur", "Fri", "Sat"};
 
-    for (int dayOfTheWeek = 0; dayOfTheWeek < 6; dayOfTheWeek++) {
-        orderedClasses(allClasses[dayOfTheWeek], allCounters[dayOfTheWeek]);
-        printClass(allDays[dayOfTheWeek], allClasses[dayOfTheWeek], allCounters[dayOfTheWeek]);
-    }
+  //for all classes array for each day of the week
+  for (int dayOfTheWeek = 0; dayOfTheWeek < 6; dayOfTheWeek++) {
+    //order the classes in the day of the week array based off of start time
+    orderedClasses(allClasses[dayOfTheWeek], allCounters[dayOfTheWeek]);
+    //print all of the classes based of the days of the week and start times
+    printClass(allDays[dayOfTheWeek], allClasses[dayOfTheWeek], allCounters[dayOfTheWeek]);
+  }
 
-    free_set(noDuplicates);
-
-
-  // ---------- GET ALL SUBJECT/COURSENO/DAYS/TO/FROM FROM THE INTERSECTION INDICIES ---------- //
-
-  // ---------- LAST 20% FUNTONALITY ---------- //
-
-  // print_set(noDuplicates);
-
-  // ---------- LAST 20% FUNTONALITY ---------- //
   return 0;
 } 
+
