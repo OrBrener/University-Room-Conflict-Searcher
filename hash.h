@@ -1,6 +1,6 @@
 #ifndef _HASH_H
 #define _HASH_H
-
+#include <stdio.h>
 #define	BUFFER	256
 #define HASHSIZE 4096
 
