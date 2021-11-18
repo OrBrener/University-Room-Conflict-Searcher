@@ -1,14 +1,14 @@
-==26386== Memcheck, a memory error detector
-==26386== Copyright (C) 2002-2017, and GNU GPL'd, by Julian Seward et al.
-==26386== Using Valgrind-3.16.1 and LibVEX; rerun with -h for copyright info
-==26386== Command: ./a6 ALEX 200
-==26386== Parent PID: 24826
-==26386== 
-==26386== 
-==26386== HEAP SUMMARY:
-==26386==     in use at exit: 0 bytes in 0 blocks
-==26386==   total heap usage: 2,521 allocs, 2,521 frees, 54,382,798 bytes allocated
-==26386== 
-==26386== All heap blocks were freed -- no leaks are possible
-==26386== 
-==26386== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)
+==27580== Memcheck, a memory error detector
+==27580== Copyright (C) 2002-2017, and GNU GPL'd, by Julian Seward et al.
+==27580== Using Valgrind-3.16.1 and LibVEX; rerun with -h for copyright info
+==27580== Command: ./a6 ALEX 200
+==27580== Parent PID: 24826
+==27580== 
+==27580== 
+==27580== HEAP SUMMARY:
+==27580==     in use at exit: 0 bytes in 0 blocks
+==27580==   total heap usage: 2,521 allocs, 2,521 frees, 54,382,798 bytes allocated
+==27580== 
+==27580== All heap blocks were freed -- no leaks are possible
+==27580== 
+==27580== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)

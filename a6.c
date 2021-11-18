@@ -14,6 +14,8 @@
 //TO TEST WITH VALGRIND
 //valgrind --log-file=logFile1.txt --track-origins=yes --leak-check=full -s --leak-check=full --show-leak-kinds=all ./a6 ALEX 200
 
+// ---------- FUNCTIONS USED FROM PROFESSOR ---------- //
+
 //steps 1 & 2
 //get index of value in filename
 //returns the index received from hash_lookup
@@ -203,24 +205,13 @@ char* getString(char* basenameInput, int index) {
   return buffer;
 }
 
-char* getElementForPrint(int index, char* elementName, char* setName) {
-
-  //get index of teh element for code i
-  getQuery(index, elementName, -1, setName);
-  //convert that set (only 1 line) into an int index
-  int elementIndex = set2Index_oneValue(setName);
-  //get the string value of the element name at index elementIndex
-  char* element = getString(elementName, elementIndex);
-  // printf("%s: %s\n", elementName, element);
-
-  return element;
-}
-
+//initialize Set struct
 struct Set {
-  int capacity;
-  char** table;
+  int capacity; //total number of elements
+  char** table; //hash table
 };
 
+//create an empty Set
 struct Set *empty(int capacity){
     struct Set *ptr;
 
@@ -245,6 +236,7 @@ struct Set *empty(int capacity){
     return ptr;
 }
 
+//check if the element is already in the set
 int is_member(struct Set *ptr, char* element) {
   int hash_idx = str2int(element, ptr->capacity);
   
@@ -267,6 +259,8 @@ int is_member(struct Set *ptr, char* element) {
   return 0;
 }
 
+//add the element in the set
+//only if it is not already in the set (no duplicates)
 void add_element(struct Set *ptr, char *element){
     if (is_member(ptr, element)){
         return;
@@ -284,6 +278,7 @@ void add_element(struct Set *ptr, char *element){
     ptr -> table[hash_idx] = element; 
 }
 
+//print the set
 void print_set(struct Set *ptr){
     printf("{ ");
     for (int i = 0; i < ptr -> capacity; i++){
@@ -294,11 +289,29 @@ void print_set(struct Set *ptr){
     printf("\b\b }");
 }
 
+//free the set
 void free_set(struct Set *ptr){
     free(ptr -> table);
     free(ptr);
 }
 
+// ---------- FUNCTIONS USED FROM PROFESSOR ---------- //
+
+//returns the String value of the element at given index
+char* getElementForPrint(int index, char* elementName, char* setName) {
+
+  //get index of the element for code i
+  getQuery(index, elementName, -1, setName);
+  //convert that set (only 1 line) into an int index
+  int elementIndex = set2Index_oneValue(setName);
+  //get the string value of the element name at index elementIndex
+  char* element = getString(elementName, elementIndex);
+  // printf("%s: %s\n", elementName, element);
+
+  return element;
+}
+
+//copy the classes subject/courseno/from/to into the corresponding day array 
 void getInfoIntoClass(char classes[][4][8], int index, char* subject, char* courseno, char* from, char* to){
     strcpy(classes[index][0], subject);
     strcpy(classes[index][1], courseno);
@@ -306,31 +319,37 @@ void getInfoIntoClass(char classes[][4][8], int index, char* subject, char* cour
     strcpy(classes[index][3], to);
 }
 
+//orders the array of classes based off of start time (bubble sort)
 void orderedClasses(char classes[][4][8], int counter) {
+    //temp variables used for swapping
     char swapSubject[5];
     char swapCourseno[5];
     char swapFrom[8];
     char swapTo[8];
 
+    //boolean; 1 = a swap is required
     int swap = 0;
 
-    for (int i = 0; i < counter - 1; i++){
-        for (int j = 0; j < counter - i - 1; j++){
+    //for all classes in the array (squared)
+    for (int i = 0; i < counter - 1; i++) {
+        for (int j = 0; j < counter - i - 1; j++) {
+            //if the first class is PM and the second class is AM, they automatically switch
             if (classes[j][2][5] == 'P' && classes[j+1][2][5] == 'A'){
                 swap = 1;
             }
-
+            //otherwise: same 12hr timezone(AM/PM)
             else if (classes[j][2][5] == classes[j+1][2][5]){
-
+                //special case for 12
                 if ((classes[j][2][0] == '1' && classes[j][2][1] == '2') && (classes[j+1][2][0] != '1' || classes[j+1][2][1] != '2')){
                     swap = 0;
                 }
                 else if ((classes[j][2][0] != '1' || classes[j][2][1] != '2') && (classes[j+1][2][0] == '1' && classes[j+1][2][1] == '2')){
                     swap = 1;
                 }
-
+                //all other cases:
                 else{
-                    for (int k = 0; k < 5; k++){
+                    //for each digit of the "from" time
+                    for (int k = 0; k < 5; k++) {
                         if (classes[j][2][k] > classes[j+1][2][k]){
                             swap = 1;
                             break;
@@ -340,31 +359,36 @@ void orderedClasses(char classes[][4][8], int counter) {
                         }
                     }
                 }
-
-                
             }
 
-            if (swap == 1){
+            //if a swap is required
+            if (swap == 1) {
+                //class class1 in temp
                 strcpy(swapSubject, classes[j][0]);
                 strcpy(swapCourseno, classes[j][1]);
                 strcpy(swapFrom, classes[j][2]);
                 strcpy(swapTo, classes[j][3]);
 
+                //copy class2 to class1
                 strcpy(classes[j][0], classes[j+1][0]);
                 strcpy(classes[j][1], classes[j+1][1]);
                 strcpy(classes[j][2], classes[j+1][2]);
                 strcpy(classes[j][3], classes[j+1][3]);
 
+                //copy temp (class1) to class2
                 strcpy(classes[j+1][0], swapSubject);
                 strcpy(classes[j+1][1], swapCourseno);
                 strcpy(classes[j+1][2], swapFrom);
                 strcpy(classes[j+1][3], swapTo);
             }
+
+            //reinitialize the boolean each loop
             swap = 0;
         }
     }
 }
 
+//prints the array of classes based off assignment description
 void printClass(char* dayOfTheWeek, char class[][4][8], int counter) {
     for (int i = 0; i < counter; i++){
         printf("%s*%s %s %s - %s\n", class[i][0], class[i][1], dayOfTheWeek, class[i][2], class[i][3]);
