@@ -11,6 +11,9 @@
 //or in one command:
 //make && ./a6 ALEX 200 > test/output.txt && diff -e test/output.txt test/expectedOutput_80%.txt && echo $'\nCOREECT OUTPUT\n'
 
+//TO TEST WITH VALGRIND
+//valgrind --log-file=logFile1.txt --track-origins=yes --leak-check=full -s --leak-check=full --show-leak-kinds=all ./a6 ALEX 200
+
 //steps 1 & 2
 //get index of value in filename
 //returns the index received from hash_lookup
@@ -104,6 +107,9 @@ void getQuery(int searchValue, char* inputFile, int index, char* outputFile) {
     }
   }
 
+  //free what is malloced so there are no memory leaks
+  free(array);
+
   fclose( fp );
 }
 
@@ -144,10 +150,14 @@ int set2Index_oneValue(char* filename) {
 
   for (int i=0; fread(&boolean,1,1,fp)==1; i++)
   {
-    if (boolean)
+    if (boolean) {
+      //close file so there is no memory leak
+      fclose(fp);
       return i;
+    }
   }
-
+  //close file so there is no memory leak
+  fclose(fp);
   return -1;
 }
 
@@ -435,6 +445,16 @@ int main( int argc, char **argv ) {
   char fridayClasses[sizeOfIntersection][4][8];
   char saturdayClasses[sizeOfIntersection][4][8];
 
+
+  //initialize all the arrays to zero so there are no memory leaks
+  memset(mondayClasses, 0, sizeof(mondayClasses));
+  memset(tuesdayClasses, 0, sizeof(tuesdayClasses));
+  memset(wednesdayClasses, 0, sizeof(wednesdayClasses));
+  memset(thursdayClasses, 0, sizeof(thursdayClasses));
+  memset(fridayClasses, 0, sizeof(fridayClasses));
+  memset(saturdayClasses, 0, sizeof(saturdayClasses));
+   
+
   //counter for the number of classes in each day of the week
   int mondayClassesCounter = 0;
   int tuesdayClassesCounter = 0;
@@ -612,6 +632,8 @@ int main( int argc, char **argv ) {
 
   //free the allocated spacec for the noDuplicates set
   free_set(noDuplicates);
+  //close the file so there is no more memory leaks
+  fclose(fp);
 
   // ---------- ORGANIZE BY TIME ---------- //
 
