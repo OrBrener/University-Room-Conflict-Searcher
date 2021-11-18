@@ -439,7 +439,7 @@ int main( int argc, char **argv ) {
   int thursdayClassesCounter = 0;
   int fridayClassesCounter = 0;
   int saturdayClassesCounter = 0;  
-
+  
   //loop through the intersection indices
   //for each index, get the subject/courseno/days/to/from
   //convert it to string for the print function
@@ -486,9 +486,7 @@ int main( int argc, char **argv ) {
 
         if (*firstLetterPointer == 'M') {
           getInfoIntoClass(mondayClasses, mondayClassesCounter, subject, courseno, from, to);
-
           mondayClassesCounter++;
-
           if (*(firstLetterPointer + 3) == ',') {
             firstLetterPointer += 5; 
           }
@@ -496,12 +494,9 @@ int main( int argc, char **argv ) {
             lastDay = 1;
           }
         }
-
         if (*firstLetterPointer == 'T' && *(firstLetterPointer + 1) == 'u' && lastDay == 0) {
           getInfoIntoClass(tuesdayClasses, tuesdayClassesCounter, subject, courseno, from, to);
-
           tuesdayClassesCounter++;
-
           if (*(firstLetterPointer + 4) == ',') {
             firstLetterPointer += 6; 
           }
@@ -509,12 +504,9 @@ int main( int argc, char **argv ) {
             lastDay = 1;
           }
         }
-
         if (*firstLetterPointer == 'W' && lastDay == 0) {
           getInfoIntoClass(wednesdayClasses, wednesdayClassesCounter, subject, courseno, from, to);
-
           wednesdayClassesCounter++;
-
           if (*(firstLetterPointer + 3) == ',') {
             firstLetterPointer += 5; 
           }
@@ -522,13 +514,9 @@ int main( int argc, char **argv ) {
             lastDay = 1;
           }
         }
-
         if (*firstLetterPointer == 'T' && *(firstLetterPointer + 1) == 'h' && lastDay == 0) {
           getInfoIntoClass(thursdayClasses, thursdayClassesCounter, subject, courseno, from, to);
-
-
           thursdayClassesCounter++;
-
           if (*(firstLetterPointer + 4) == ',') {
             firstLetterPointer += 6; 
           }
@@ -536,13 +524,9 @@ int main( int argc, char **argv ) {
             lastDay = 1;
           }
         }
-
         if (*firstLetterPointer == 'F' && lastDay == 0) {
           getInfoIntoClass(fridayClasses, fridayClassesCounter, subject, courseno, from, to);
-
-
           fridayClassesCounter++;
-
           if (*(firstLetterPointer + 3) == ',') {
             firstLetterPointer += 5; 
           }
@@ -550,10 +534,8 @@ int main( int argc, char **argv ) {
             lastDay = 1;
           }
         }
-
         if (*firstLetterPointer == 'S' && lastDay == 0) {
           getInfoIntoClass(saturdayClasses, saturdayClassesCounter, subject, courseno, from, to);
-
           saturdayClassesCounter++;
         }
 
@@ -566,25 +548,31 @@ int main( int argc, char **argv ) {
     }
   }
 
-    orderedClasses(mondayClasses, mondayClassesCounter);
+  char allClasses[6][sizeOfIntersection][4][8];
+  int allCounters[6] = {mondayClassesCounter, tuesdayClassesCounter, wednesdayClassesCounter, thursdayClassesCounter, fridayClassesCounter, saturdayClassesCounter};
 
-    orderedClasses(tuesdayClasses, tuesdayClassesCounter);
+  for (int i = 0; i < 5; i++) {
+    for (int j = 0; j<allCounters[i]; j++) {
+      for (int k = 0; k<4; k++) {
+        for (int l = 0; l<8; l++) {
+          strcpy(&allClasses[0][j][k][l], &mondayClasses[j][k][l]);
+          strcpy(&allClasses[1][j][k][l], &tuesdayClasses[j][k][l]);
+          strcpy(&allClasses[2][j][k][l], &wednesdayClasses[j][k][l]);
+          strcpy(&allClasses[3][j][k][l], &thursdayClasses[j][k][l]);
+          strcpy(&allClasses[4][j][k][l], &fridayClasses[j][k][l]);
+          strcpy(&allClasses[5][j][k][l], &saturdayClasses[j][k][l]);
 
-    orderedClasses(wednesdayClasses, wednesdayClassesCounter);
+        }
+      }
+    }
+  }
 
-    orderedClasses(thursdayClasses, thursdayClassesCounter);
+  char* allDays[6] = {"Mon", "Tues", "Wed", "Thur", "Fri", "Sat"};
 
-    orderedClasses(fridayClasses, fridayClassesCounter);
-
-    orderedClasses(saturdayClasses, saturdayClassesCounter);
-
-    printClass("Mon", mondayClasses, mondayClassesCounter);
-    printClass("Tues", tuesdayClasses, tuesdayClassesCounter);
-    printClass("Wed", wednesdayClasses, wednesdayClassesCounter);
-    printClass("Thur", thursdayClasses, thursdayClassesCounter);
-    printClass("Fri", fridayClasses, fridayClassesCounter);
-    printClass("Sat", saturdayClasses, saturdayClassesCounter);
-
+    for (int dayOfTheWeek = 0; dayOfTheWeek < 6; dayOfTheWeek++) {
+        orderedClasses(allClasses[dayOfTheWeek], allCounters[dayOfTheWeek]);
+        printClass(allDays[dayOfTheWeek], allClasses[dayOfTheWeek], allCounters[dayOfTheWeek]);
+    }
 
     free_set(noDuplicates);
 
