@@ -1,0 +1,20 @@
+ 1                                      ENVS*1030 Mon: 1
+ 2                                      PSYC*3290 Mon: 1
+ 3                                      SOAN*2120 Mon: 1
+ 4                                      PHYS*1130 Mon: 1
+ 5                                     FOOD*2150 Tues: 1
+ 6                                      NUTR*1010 Mon: 1
+ 7                                      PHYS*1300 Mon: 1
+ 8                                      CLAS*1000 Mon: 1
+ 9                                      PHYS*1300 Mon: 1
+10                     CIS*6650 Wed 02:30PM - 05:20PM: 1
+11                     CIS*6550 Fri 09:00AM - 11:50AM: 1
+12                                       Output count: 1
+13                          Duplicates removed (2pts): 2
+14                                      Sorted (2pts): 2
+17                                    makefile exists: 1
+18                           correct makefile options: 1
+19                                  code has comments: 1
+20                                   code is indented: 1
+========================================================
+Total:                                             20/20

@@ -1,0 +1,30 @@
+################################################################################
+Compiling and linking gradeA6_a6
+Issuing compile command "clang -std=c99 -Wall -pedantic -I ~/Grading/Graders -I . ~/Grading/Graders/hash.c a6.c -o a6 1> compile.out 2> compile.err":
+Found a6 (/home/socs/Grading/Repos/A6/obrener)
+Compilation succeeded
+================================================================================
+Found 'ENVS*1030 Mon'
+Found 'PSYC*3290 Mon'
+Found 'SOAN*2120 Mon'
+================================================================================
+Found 'PHYS*1130 Mon'
+Found 'FOOD*2150 Tues'
+Found 'NUTR*1010 Mon'
+================================================================================
+Found 'PHYS*1300 Mon'
+Found 'CLAS*1000 Mon'
+Found 'PHYS*1300 Mon'
+================================================================================
+Found 'CIS*6650 Wed 02:30PM - 05:20PM'
+Found 'CIS*6550 Fri 09:00AM - 11:50AM'
+Correct output count
+================================================================================
+Duplicates removed
+================================================================================
+Data is sorted
+Found makefile
+Correct options
+Comments
+Indentation levels are: ['', '  ', '   ', '    ', '      ', '        ', '          ', '            ', '                ', '                    ', '                        ', '                            ']
+Assignment submitted by Or Brener <obrener@uoguelph.ca> at: Thu Nov 18 02:20:24 2021
